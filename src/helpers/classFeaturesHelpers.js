@@ -1,29 +1,27 @@
 const attributeBoostLevels = [5, 10, 15, 20];
-const gradualBoostLevels = [
-  2, 3, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20
-];
+const gradualBoostLevels = [2, 3, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 17, 18, 19, 20];
 const newSpellRankLevels = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
 
-const stripParagraphTags = (html) => html?.replace(/^<p>|<\/p>$/g, '') || '';
+const stripParagraphTags = (html) => html?.replace(/^<p>|<\/p>$/g, "") || "";
 
 const getIconClassForUUID = async (uuid) => {
   const typeMapping = {
-    conditionitems: 'fa-solid fa-face-zany',
-    classfeatures: 'fa-solid fa-medal',
-    'feats-srd': 'fa-solid fa-medal',
-    actionspf2e: 'fa-solid fa-running',
-    'spells-srd': 'fa-solid fa-sparkles',
-    'feat-effects': 'fa-solid fa-person-rays'
+    conditionitems: "fa-solid fa-face-zany",
+    classfeatures: "fa-solid fa-medal",
+    "feats-srd": "fa-solid fa-medal",
+    actionspf2e: "fa-solid fa-running",
+    "spells-srd": "fa-solid fa-sparkles",
+    "feat-effects": "fa-solid fa-person-rays"
   };
 
-  const uuidParts = uuid.split('.');
+  const uuidParts = uuid.split(".");
   const packName = uuidParts[2];
 
-  if (packName === 'equipment-srd') {
+  if (packName === "equipment-srd") {
     return await getEquipmentIconClass(uuid);
   }
 
-  return typeMapping[packName] || 'fa-solid fa-file-lines';
+  return typeMapping[packName] || "fa-solid fa-file-lines";
 };
 
 const getEquipmentIconClass = async (uuid) => {
@@ -32,15 +30,15 @@ const getEquipmentIconClass = async (uuid) => {
     const equipmentType = item?.type;
 
     const equipmentMapping = {
-      weapon: 'fa-solid fa-sword',
-      shield: 'fa-solid fa-shield-halved',
-      equipment: 'fa-solid fa-hat-cowboy'
+      weapon: "fa-solid fa-sword",
+      shield: "fa-solid fa-shield-halved",
+      equipment: "fa-solid fa-hat-cowboy"
     };
 
-    return equipmentMapping[equipmentType] || 'fa-solid fa-file-lines';
+    return equipmentMapping[equipmentType] || "fa-solid fa-file-lines";
   } catch (error) {
     console.error(`Error fetching equipment data for UUID ${uuid}:`, error);
-    return 'fa-solid fa-file-lines';
+    return "fa-solid fa-file-lines";
   }
 };
 
@@ -69,11 +67,11 @@ const replaceUUIDsWithLinks = async (description) => {
 export const getClassSpecificDescription = (description, characterClass) => {
   if (!description || !characterClass) return description;
 
-  const regex = new RegExp(`<p><strong>(.*?)</strong>(.*?)</p>`, 'gi');
+  const regex = new RegExp(`<p><strong>(.*?)</strong>(.*?)</p>`, "gi");
 
   let match;
   while ((match = regex.exec(description))) {
-    const classes = match[1].split(',').map((c) => c.trim().toLowerCase());
+    const classes = match[1].split(",").map((c) => c.trim().toLowerCase());
     if (classes.includes(characterClass.toLowerCase())) {
       return `<p>${match[2].trim()}</p>`;
     }
@@ -88,14 +86,9 @@ const mapFeaturesWithDetails = async (features, characterClass) => {
       const item = await fromUuid(feature.uuid).catch(() => null);
       if (!item) return null;
 
-      const filteredDescription = getClassSpecificDescription(
-        item.system.description.value,
-        characterClass
-      );
+      const filteredDescription = getClassSpecificDescription(item.system.description.value, characterClass);
 
-      const enrichedDescription = await replaceUUIDsWithLinks(
-        stripParagraphTags(filteredDescription)
-      );
+      const enrichedDescription = await replaceUUIDsWithLinks(stripParagraphTags(filteredDescription));
 
       return {
         name: item.name,
@@ -107,35 +100,20 @@ const mapFeaturesWithDetails = async (features, characterClass) => {
   ).then((results) => results.filter((feature) => feature));
 };
 
-export const getFeaturesForLevel = async (
-  characterData,
-  targetLevel,
-  gradualBoosts
-) => {
+export const getFeaturesForLevel = async (characterData, targetLevel, gradualBoosts) => {
   const characterClass = characterData?.class?.name;
   const spellcasting = characterData?.class?.system?.spellcasting;
   const featuresArray = Object.values(characterData?.class?.system?.items);
 
-  const featuresForLevel = featuresArray.filter(
-    (boon) => boon.level === targetLevel
-  );
+  const featuresForLevel = featuresArray.filter((boon) => boon.level === targetLevel);
 
-  const featuresWithDetails = await mapFeaturesWithDetails(
-    featuresForLevel,
-    characterClass
-  );
+  const featuresWithDetails = await mapFeaturesWithDetails(featuresForLevel, characterClass);
 
-  const currentBoostSet = attributeBoostLevels.find(
-    (level) => level >= targetLevel
-  );
-  let allowedBoostsForSet =
-    characterData.system.build.attributes.allowedBoosts[currentBoostSet];
+  const currentBoostSet = attributeBoostLevels.find((level) => level >= targetLevel);
+  let allowedBoostsForSet = characterData.system.build.attributes.allowedBoosts[currentBoostSet];
 
   if (gradualBoosts && gradualBoostLevels.includes(targetLevel)) {
-    if (
-      currentBoostSet &&
-      targetLevel !== characterData.system.details.level.value
-    ) {
+    if (currentBoostSet && targetLevel !== characterData.system.details.level.value) {
       allowedBoostsForSet = (allowedBoostsForSet || 0) + 1;
     }
   } else {
@@ -165,7 +143,7 @@ export const detectPartialBoosts = (actor, boostsForCurrentSet) => {
       value.forEach((boost) => {
         boostCounts[boost] = (boostCounts[boost] || 0) + 1;
       });
-    } else if (key === 'class' && typeof value === 'string') {
+    } else if (key === "class" && typeof value === "string") {
       boostCounts[value] = (boostCounts[value] || 0) + 1;
     }
   });

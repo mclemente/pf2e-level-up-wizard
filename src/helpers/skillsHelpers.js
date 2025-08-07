@@ -1,47 +1,47 @@
-import { module_name } from '../main.js';
-import { capitalize } from './utility.js';
+import { module_name } from "../main.js";
+import { capitalize } from "./utility.js";
 export const skillProficiencyRanks = {
-  0: 'Untrained',
-  1: 'Trained',
-  2: 'Expert',
-  3: 'Master',
-  4: 'Legendary'
+  0: "Untrained",
+  1: "Trained",
+  2: "Expert",
+  3: "Master",
+  4: "Legendary"
 };
 
 const getSkillRankClass = (rank) => {
   switch (rank) {
     case 0:
-      return 'skill-option-untrained';
+      return "skill-option-untrained";
     case 1:
-      return 'skill-option-trained';
+      return "skill-option-trained";
     case 2:
-      return 'skill-option-expert';
+      return "skill-option-expert";
     case 3:
-      return 'skill-option-master';
+      return "skill-option-master";
     case 4:
-      return 'skill-option-legendary';
+      return "skill-option-legendary";
     default:
-      return '';
+      return "";
   }
 };
 
 export const SKILLS = [
-  'acrobatics',
-  'arcana',
-  'athletics',
-  'crafting',
-  'deception',
-  'diplomacy',
-  'intimidation',
-  'medicine',
-  'nature',
-  'occultism',
-  'performance',
-  'religion',
-  'society',
-  'stealth',
-  'survival',
-  'thievery'
+  "acrobatics",
+  "arcana",
+  "athletics",
+  "crafting",
+  "deception",
+  "diplomacy",
+  "intimidation",
+  "medicine",
+  "nature",
+  "occultism",
+  "performance",
+  "religion",
+  "society",
+  "stealth",
+  "survival",
+  "thievery"
 ];
 
 export const getMaxSkillProficiency = (level) => {
@@ -54,30 +54,25 @@ const SKILL_TRANSLATIONS_MAP = {};
 
 export const getSkillTranslation = (skill) => {
   if (!SKILL_TRANSLATIONS_MAP[skill]) {
-    SKILL_TRANSLATIONS_MAP[skill] = game.i18n.localize(
-      `PF2E.Skill.${capitalize(skill)}`
-    );
+    SKILL_TRANSLATIONS_MAP[skill] = game.i18n.localize(`PF2E.Skill.${capitalize(skill)}`);
   }
   return SKILL_TRANSLATIONS_MAP[skill];
 };
 
 const getSkillDropdownLabel = (skillName, modifier, nextRank) => {
-  const skillIncreaseInfo = game.settings.get(
-    module_name,
-    'skill-increase-info'
-  );
+  const skillIncreaseInfo = game.settings.get(module_name, "skill-increase-info");
 
   switch (skillIncreaseInfo) {
-    case 'NAME_ONLY':
+    case "NAME_ONLY":
       return `${skillName}`;
-    case 'NAME_WITH_MOD':
+    case "NAME_WITH_MOD":
       return `${skillName} +${modifier}`;
-    case 'NAME_WITH_RANK':
+    case "NAME_WITH_RANK":
       if (!nextRank) {
         return `${skillName}`;
       }
       return `${skillName} → ${nextRank}`;
-    case 'NAME_WITH_MOD_AND_RANK':
+    case "NAME_WITH_MOD_AND_RANK":
       if (!nextRank) {
         return `${skillName} +${modifier}`;
       }
@@ -117,21 +112,15 @@ export const getAssociatedSkills = (prerequisites) => {
     .flatMap((prereq) => {
       const matches = SKILLS.filter(
         (skill) =>
-          new RegExp(`\\b${skill}\\b`, 'i').test(prereq.value) ||
-          new RegExp(`\\b${getSkillTranslation(skill)}\\b`, 'i').test(
-            prereq.value
-          )
+          new RegExp(`\\b${skill}\\b`, "i").test(prereq.value) ||
+          new RegExp(`\\b${getSkillTranslation(skill)}\\b`, "i").test(prereq.value)
       );
       return matches;
     })
     .filter(Boolean);
 };
 
-export const getSkillPotencyForLevel = (
-  characterData,
-  targetLevel,
-  isABPEnabled
-) => {
+export const getSkillPotencyForLevel = (characterData, targetLevel, isABPEnabled) => {
   if (!isABPEnabled) {
     return { hasSkillPotencyUpgrade: false };
   }
@@ -155,9 +144,7 @@ export const getSkillPotencyForLevel = (
   const skillsWithPotency = [];
 
   allSkills.forEach((skill) => {
-    const potencyModifier = skill.modifiers.find(
-      (mod) => mod.type === 'potency'
-    );
+    const potencyModifier = skill.modifiers.find((mod) => mod.type === "potency");
     if (potencyModifier) {
       skillsWithPotency.push(skill);
       currentPotencyLevels.push({
@@ -170,10 +157,7 @@ export const getSkillPotencyForLevel = (
   const newPotencyLevels = [3, 6, 13, 15, 17, 20];
   const potencyAvailableNewBoosts = newPotencyLevels.includes(targetLevel)
     ? allSkills.filter(
-        (skill) =>
-          !currentPotencyLevels.some(
-            (potentSkill) => potentSkill.skill === capitalize(skill.slug)
-          )
+        (skill) => !currentPotencyLevels.some((potentSkill) => potentSkill.skill === capitalize(skill.slug))
       )
     : undefined;
 
@@ -181,9 +165,7 @@ export const getSkillPotencyForLevel = (
   const potencyUpgradeTo2Options = upgradeTo2Levels.includes(targetLevel)
     ? skillsWithPotency.filter((skill) =>
         currentPotencyLevels.some(
-          (potentSkill) =>
-            potentSkill.potency === 1 &&
-            potentSkill.skill === capitalize(skill.slug)
+          (potentSkill) => potentSkill.potency === 1 && potentSkill.skill === capitalize(skill.slug)
         )
       )
     : undefined;
@@ -192,9 +174,7 @@ export const getSkillPotencyForLevel = (
   const potencyUpgradeTo3Options = upgradeTo3Levels.includes(targetLevel)
     ? skillsWithPotency.filter((skill) =>
         currentPotencyLevels.some(
-          (potentSkill) =>
-            potentSkill.potency === 2 &&
-            potentSkill.skill === capitalize(skill.slug)
+          (potentSkill) => potentSkill.potency === 2 && potentSkill.skill === capitalize(skill.slug)
         )
       )
     : undefined;
@@ -211,11 +191,11 @@ export const getSkillPotencyForLevel = (
 export const buildPotencyModifier = (modifier) => {
   return [
     {
-      slug: 'potency',
-      label: 'Potency',
+      slug: "potency",
+      label: "Potency",
       domains: [],
       modifier: modifier,
-      type: 'potency',
+      type: "potency",
       ability: null,
       adjustments: [],
       force: false,
@@ -228,7 +208,7 @@ export const buildPotencyModifier = (modifier) => {
       critical: null,
       tags: [],
       hideIfDisabled: false,
-      kind: 'bonus',
+      kind: "bonus",
       predicate: []
     }
   ];

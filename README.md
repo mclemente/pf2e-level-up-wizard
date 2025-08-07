@@ -26,6 +26,7 @@ Any time a feat selection is prompted, the wizard will only show you feats that 
 These feats can be filtered and sorted, allowing for an easier time finding the feat that you're looking for!
 
 Current filters include:
+
 - Search by Name
 - Level Min
 - Level Max
@@ -46,7 +47,7 @@ In addition, if the player character is a spellcaster, they will receive a whisp
 - **Enable Level Up Button (GM Only)**: Choose whether to show a Level-Up button on character sheets. When disabled, the Level-Up Wizard will activate automatically after manually updating a character's level.
 - **Level-Up Button Placement**: Select where the Level-Up button appears: either next to the character's level or in the toolbar at the top of the character sheet.
 - **Feat Sorting Method**: Choose how feats should be sorted by default.
-- **Display Feat Prerequisites (GM Only)**: Toggle whether an asterisk (*) appears next to Feats with prerequisites in dropdowns.
+- **Display Feat Prerequisites (GM Only)**: Toggle whether an asterisk (\*) appears next to Feats with prerequisites in dropdowns.
 - **Disable Level Input (GM Only)**: If enabled, the default level input on the character sheet will be disabled to encourage the use of the Level-Up Wizard for leveling up. This setting has no effect if the 'Enable Level-Up Button' setting is disabled.
 - **Send Manual Update Whispers to GM (GM Only)**: When enabled, whispers about required manual updates (such as spell updates) will also be sent to the GM in addition to the player.
 

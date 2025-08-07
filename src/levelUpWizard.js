@@ -1,33 +1,26 @@
-import { FeatSelector } from './featSelector.js';
-import { module_name } from './main.js';
+import { FeatSelector } from "./featSelector.js";
+import { module_name } from "./main.js";
 
 // @Helpers
-import {
-  detectPartialBoosts,
-  getFeaturesForLevel
-} from './helpers/classFeaturesHelpers.js';
-import { getFeatsForLevel } from './helpers/featsHelpers.js';
-import {
-  attachAttributeBoostHandlers,
-  attachValidationHandlers
-} from './helpers/formHelpers.js';
+import { detectPartialBoosts, getFeaturesForLevel } from "./helpers/classFeaturesHelpers.js";
+import { getFeatsForLevel } from "./helpers/featsHelpers.js";
+import { attachAttributeBoostHandlers, attachValidationHandlers } from "./helpers/formHelpers.js";
 import {
   confirmChanges,
   createGlobalLevelMessage,
   createPersonalLevelMessage,
   getClassJournal
-} from './helpers/foundryHelpers.js';
+} from "./helpers/foundryHelpers.js";
 import {
   buildPotencyModifier,
   getSkillPotencyForLevel,
   getSkillsForLevel,
   getSkillTranslation,
   skillProficiencyRanks
-} from './helpers/skillsHelpers.js';
-import { normalizeString } from './helpers/utility.js';
+} from "./helpers/skillsHelpers.js";
+import { normalizeString } from "./helpers/utility.js";
 
-export class PF2eLevelUpWizardConfig extends foundry.applications.api
-  .ApplicationV2 {
+export class PF2eLevelUpWizardConfig extends foundry.applications.api.ApplicationV2 {
   constructor(actorData, triggeredByManualLevelUp = false) {
     super();
     this.actorData = actorData;
@@ -36,15 +29,15 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
   }
 
   static DEFAULT_OPTIONS = {
-    id: 'level-up-wizard',
+    id: "level-up-wizard",
     position: {
-      height: 'auto',
+      height: "auto",
       width: 600
     },
     window: {
       resizable: true
     },
-    tag: 'form',
+    tag: "form",
     form: {
       handler: PF2eLevelUpWizardConfig.onSubmit,
       closeOnSubmit: false
@@ -53,42 +46,39 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
 
   static PARTS = {
     levelUpWizard: {
-      template: './modules/pf2e-level-up-wizard/templates/level-up-wizard.hbs'
+      template: "./modules/pf2e-level-up-wizard/templates/level-up-wizard.hbs"
     }
   };
 
   get title() {
-    return game.i18n.localize('PF2E_LEVEL_UP_WIZARD.menu.title');
+    return game.i18n.localize("PF2E_LEVEL_UP_WIZARD.menu.title");
   }
 
   _onRender(context) {
     const html = $(this.element);
 
-    const { actorName, targetLevel, allowedBoostsForSet, currentBoostSet } =
-      context;
+    const { actorName, targetLevel, allowedBoostsForSet, currentBoostSet } = context;
 
     const requiredFeats = [];
     const featButtons = {};
 
-    html.find('.feat-selector-toggle').each((_, button) => {
-      const id = $(button).attr('id');
+    html.find(".feat-selector-toggle").each((_, button) => {
+      const id = $(button).attr("id");
       if (id) {
         requiredFeats.push(id);
         featButtons[id] = $(button);
-        $(button).on('click', () => {
-          new FeatSelector(context[id], id, actorName, targetLevel).render(
-            true
-          );
+        $(button).on("click", () => {
+          new FeatSelector(context[id], id, actorName, targetLevel).render(true);
         });
       }
     });
 
-    window.addEventListener('featSelected', (event) => {
+    window.addEventListener("featSelected", (event) => {
       const { featType, selectedFeat } = event.detail;
       const button = featButtons[featType];
       if (button) {
         button.text(
-          game.i18n.format('PF2E_LEVEL_UP_WIZARD.menu.featButtonContent', {
+          game.i18n.format("PF2E_LEVEL_UP_WIZARD.menu.featButtonContent", {
             name: selectedFeat.name,
             level: selectedFeat.system.level.value
           })
@@ -99,7 +89,7 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
     });
 
     const submitButton = html.find('button[type="submit"]');
-    const attributeButtons = html.find('.attribute-boosts-button');
+    const attributeButtons = html.find(".attribute-boosts-button");
     const selectedBoosts = new Set();
 
     const validateForm = attachValidationHandlers(
@@ -111,12 +101,8 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       allowedBoostsForSet
     );
 
-    const boostsForCurrentSet =
-      this.actorData.system.build.attributes.boosts[currentBoostSet];
-    const partialBoosts = detectPartialBoosts(
-      this.actorData,
-      boostsForCurrentSet
-    );
+    const boostsForCurrentSet = this.actorData.system.build.attributes.boosts[currentBoostSet];
+    const partialBoosts = detectPartialBoosts(this.actorData, boostsForCurrentSet);
 
     attachAttributeBoostHandlers(
       attributeButtons,
@@ -129,52 +115,37 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
   }
 
   async _renderHTML(context) {
-    return renderTemplate(
-      './modules/pf2e-level-up-wizard/templates/level-up-wizard.hbs',
-      context
-    );
+    return renderTemplate("./modules/pf2e-level-up-wizard/templates/level-up-wizard.hbs", context);
   }
 
   _replaceHTML(element, html) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.innerHTML = element;
     html.replaceChildren(div);
   }
 
   close(options) {
-    const form = $(this.element).find('form');
-    form.off('change', '[data-required="true"]');
+    const form = $(this.element).find("form");
+    form.off("change", '[data-required="true"]');
     return super.close(options);
   }
 
   async _prepareContext() {
     const actorName = this.actorData.name;
     const currentLevel = this.actorData.system.details.level.value;
-    const targetLevel = this.triggeredByManualLevelUp
-      ? currentLevel
-      : currentLevel + 1;
+    const targetLevel = this.triggeredByManualLevelUp ? currentLevel : currentLevel + 1;
 
     const isReallyPC = !this.actorData.traits.has("minion") && !this.actorData.traits.has("eidolon");
-    const freeArchetype = game.settings.get('pf2e', 'freeArchetypeVariant') && isReallyPC;
-    const mythicVariantEnabled =
-      game.settings.get('pf2e', 'mythic') === 'enabled' && isReallyPC;
-    const ABPEnabled =
-      game.settings.get('pf2e', 'automaticBonusVariant') !== 'noABP';
+    const freeArchetype = game.settings.get("pf2e", "freeArchetypeVariant") && isReallyPC;
+    const mythicVariantEnabled = game.settings.get("pf2e", "mythic") === "enabled" && isReallyPC;
+    const ABPEnabled = game.settings.get("pf2e", "automaticBonusVariant") !== "noABP";
     const ancestryParagon =
-      game.modules.get('xdy-pf2e-workbench')?.active &&
-      game.settings.get(
-        'xdy-pf2e-workbench',
-        'legacyVariantRuleAncestryParagon'
-      )
-      && isReallyPC;
-    const showFeatPrerequisites = game.settings.get(
-      module_name,
-      'show-feat-prerequisites'
-    );
+      game.modules.get("xdy-pf2e-workbench")?.active &&
+      game.settings.get("xdy-pf2e-workbench", "legacyVariantRuleAncestryParagon") &&
+      isReallyPC;
+    const showFeatPrerequisites = game.settings.get(module_name, "show-feat-prerequisites");
 
-    const classNames = this.actorData.class?.name
-      .split('-')
-      .map((cls) => cls.trim());
+    const classNames = this.actorData.class?.name.split("-").map((cls) => cls.trim());
 
     // use the original english class name for determining the feats, if the name was translated with babele
     let originalClassName;
@@ -184,56 +155,27 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
     let primaryClass = classNames[0];
     let secondaryClass = classNames[1] || null;
 
-    const classFeats = await getFeatsForLevel(
-      this.actorData,
-      'class',
-      targetLevel,
-      originalClassName || primaryClass
-    );
+    const classFeats = await getFeatsForLevel(this.actorData, "class", targetLevel, originalClassName || primaryClass);
     let dualClassFeats = [];
     if (secondaryClass) {
-      dualClassFeats = await getFeatsForLevel(
-        this.actorData,
-        'class',
-        targetLevel,
-        secondaryClass
-      );
+      dualClassFeats = await getFeatsForLevel(this.actorData, "class", targetLevel, secondaryClass);
     }
-    const mythicFeats =
-      mythicVariantEnabled &&
-      (await getFeatsForLevel(this.actorData, 'mythic', targetLevel));
-    const ancestryFeats = await getFeatsForLevel(
-      this.actorData,
-      'ancestry',
-      targetLevel
-    );
-    const skillFeats = await getFeatsForLevel(
-      this.actorData,
-      'skill',
-      targetLevel
-    );
-    const generalFeats = await getFeatsForLevel(
-      this.actorData,
-      'general',
-      targetLevel
-    );
-    const freeArchetypeFeats =
-      freeArchetype &&
-      (await getFeatsForLevel(this.actorData, 'archetype', targetLevel));
+    const mythicFeats = mythicVariantEnabled && (await getFeatsForLevel(this.actorData, "mythic", targetLevel));
+    const ancestryFeats = await getFeatsForLevel(this.actorData, "ancestry", targetLevel);
+    const skillFeats = await getFeatsForLevel(this.actorData, "skill", targetLevel);
+    const generalFeats = await getFeatsForLevel(this.actorData, "general", targetLevel);
+    const freeArchetypeFeats = freeArchetype && (await getFeatsForLevel(this.actorData, "archetype", targetLevel));
     const ancestryParagonFeats =
-      ancestryParagon &&
-      (await getFeatsForLevel(this.actorData, 'ancestryParagon', targetLevel));
+      ancestryParagon && (await getFeatsForLevel(this.actorData, "ancestryParagon", targetLevel));
     const {
       hasSkillPotencyUpgrade,
       potencyAvailableNewBoosts,
       potencyUpgradeTo2Options,
       potencyUpgradeTo3Options,
       currentPotencyLevels
-    } =
-      ABPEnabled &&
-      getSkillPotencyForLevel(this.actorData, targetLevel, ABPEnabled);
+    } = ABPEnabled && getSkillPotencyForLevel(this.actorData, targetLevel, ABPEnabled);
 
-    const gradualBoosts = game.settings.get('pf2e', 'gradualBoostsVariant');
+    const gradualBoosts = game.settings.get("pf2e", "gradualBoostsVariant");
 
     const {
       featuresForLevel,
@@ -244,18 +186,13 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       spellcasting
     } = await getFeaturesForLevel(this.actorData, targetLevel, gradualBoosts);
 
-    const boostsForCurrentSet =
-      this.actorData.system.build.attributes.boosts[currentBoostSet];
+    const boostsForCurrentSet = this.actorData.system.build.attributes.boosts[currentBoostSet];
 
     const attributes = detectPartialBoosts(this.actorData, boostsForCurrentSet);
     const skills = getSkillsForLevel(this.actorData, targetLevel);
     const classJournals = await getClassJournal(this.actorData);
 
-    const hasFeaturesToDisplay = !!(
-      featuresForLevel.length > 0 ||
-      newSpellRankLevel ||
-      spellcasting
-    );
+    const hasFeaturesToDisplay = !!(featuresForLevel.length > 0 || newSpellRankLevel || spellcasting);
 
     return {
       primaryClass,
@@ -298,9 +235,7 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
 
     const actor = this.actorData;
     const currentLevel = actor.system.details.level.value;
-    const targetLevel = this.triggeredByManualLevelUp
-      ? currentLevel
-      : currentLevel + 1;
+    const targetLevel = this.triggeredByManualLevelUp ? currentLevel : currentLevel + 1;
     const playerId = game.user.id;
     const actorName = actor.name;
 
@@ -315,15 +250,15 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
 
     if (!this.triggeredByManualLevelUp) {
       ui.notifications.info(
-        game.i18n.format('PF2E_LEVEL_UP_WIZARD.notifications.levelUpStart', {
+        game.i18n.format("PF2E_LEVEL_UP_WIZARD.notifications.levelUpStart", {
           actorName,
           targetLevel
         })
       );
 
-      await actor.update({ 'system.details.level.value': targetLevel });
+      await actor.update({ "system.details.level.value": targetLevel });
 
-      await Hooks.once('updateActor', () => {});
+      await Hooks.once("updateActor", () => {});
     }
 
     const featEntries = Object.entries({
@@ -344,19 +279,17 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       return { feat, type };
     });
 
-    const featsToAdd = (await Promise.all(featPromises)).filter(
-      ({ feat }) => feat
-    );
+    const featsToAdd = (await Promise.all(featPromises)).filter(({ feat }) => feat);
 
     const featGroupMap = {
-      classFeats: 'class',
-      dualClassFeats: 'xdy_dualclass',
-      ancestryFeats: 'ancestry',
-      skillFeats: 'skill',
-      generalFeats: 'general',
-      freeArchetypeFeats: 'archetype',
-      ancestryParagonFeats: 'xdy_ancestryparagon',
-      mythicFeats: 'mythic'
+      classFeats: "class",
+      dualClassFeats: "xdy_dualclass",
+      ancestryFeats: "ancestry",
+      skillFeats: "skill",
+      generalFeats: "general",
+      freeArchetypeFeats: "archetype",
+      ancestryParagonFeats: "xdy_ancestryparagon",
+      mythicFeats: "mythic"
     };
 
     const itemsToCreate = featsToAdd.map(({ feat, type }) => {
@@ -371,9 +304,9 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       return featClone;
     });
 
-    await actor.createEmbeddedDocuments('Item', itemsToCreate);
+    await actor.createEmbeddedDocuments("Item", itemsToCreate);
 
-    let skillIncreaseMessage = '';
+    let skillIncreaseMessage = "";
     if (finalData.skills) {
       const normalizedSkill = normalizeString(finalData.skills);
       const translatedSkill = getSkillTranslation(normalizedSkill);
@@ -383,17 +316,14 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
 
       const rankName =
         skillProficiencyRanks[updatedRank] ||
-        game.i18n.format(
-          'PF2E_LEVEL_UP_WIZARD.messages.skillIncrease.rankName',
-          {
-            updatedRank
-          }
-        );
+        game.i18n.format("PF2E_LEVEL_UP_WIZARD.messages.skillIncrease.rankName", {
+          updatedRank
+        });
 
-      skillIncreaseMessage = game.i18n.format(
-        'PF2E_LEVEL_UP_WIZARD.messages.skillIncrease.rankIncrease',
-        { skill: translatedSkill, rankName }
-      );
+      skillIncreaseMessage = game.i18n.format("PF2E_LEVEL_UP_WIZARD.messages.skillIncrease.rankIncrease", {
+        skill: translatedSkill,
+        rankName
+      });
     }
 
     if (finalData.newPotency) {
@@ -407,11 +337,7 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       });
 
       skillIncreaseMessage +=
-        ' ' +
-        game.i18n.format(
-          'PF2E_LEVEL_UP_WIZARD.messages.skillPotency.newPotency',
-          { skill: translatedSkill }
-        );
+        " " + game.i18n.format("PF2E_LEVEL_UP_WIZARD.messages.skillPotency.newPotency", { skill: translatedSkill });
     }
 
     if (finalData.upgradePotencyTo2) {
@@ -425,11 +351,7 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       });
 
       skillIncreaseMessage +=
-        ' ' +
-        game.i18n.format(
-          'PF2E_LEVEL_UP_WIZARD.messages.skillPotency.upgradeTo2',
-          { skill: translatedSkill }
-        );
+        " " + game.i18n.format("PF2E_LEVEL_UP_WIZARD.messages.skillPotency.upgradeTo2", { skill: translatedSkill });
     }
 
     if (finalData.upgradePotencyTo3) {
@@ -443,31 +365,17 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       });
 
       skillIncreaseMessage +=
-        ' ' +
-        game.i18n.format(
-          'PF2E_LEVEL_UP_WIZARD.messages.skillPotency.upgradeTo3',
-          { skill: translatedSkill }
-        );
+        " " + game.i18n.format("PF2E_LEVEL_UP_WIZARD.messages.skillPotency.upgradeTo3", { skill: translatedSkill });
     }
 
-    const selectedFeats = featsToAdd
-      .map(({ feat }) => `@UUID[${feat.uuid}]`)
-      .join(', ');
+    const selectedFeats = featsToAdd.map(({ feat }) => `@UUID[${feat.uuid}]`).join(", ");
 
     if (finalData.attributeBoostLevel) {
-      const attributeBoosts = $(this.element).find(
-        '.attribute-boosts-button.selected'
-      );
-      finalData.attributeBoosts = Array.from(attributeBoosts).map((button) =>
-        $(button).data('value')
-      );
+      const attributeBoosts = $(this.element).find(".attribute-boosts-button.selected");
+      finalData.attributeBoosts = Array.from(attributeBoosts).map((button) => $(button).data("value"));
 
       if (finalData.attributeBoosts.length !== finalData.allowedBoostsForSet) {
-        ui.notifications.error(
-          game.i18n.localize(
-            'PF2E_LEVEL_UP_WIZARD.notifications.invalidBoostSelection'
-          )
-        );
+        ui.notifications.error(game.i18n.localize("PF2E_LEVEL_UP_WIZARD.notifications.invalidBoostSelection"));
         return;
       }
 
@@ -478,25 +386,20 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       await actor.update(updateData);
     }
 
-    if (game.settings.get('pf2e-level-up-wizard', 'xp-enforcement')) {
+    if (game.settings.get("pf2e-level-up-wizard", "xp-enforcement")) {
       const currentXP = actor.system.details.xp.value;
       const XPToLevel = actor.system.details.xp.max;
       const XPAfterLevel = currentXP - XPToLevel;
 
-      await actor.update({ 'system.details.xp.value': XPAfterLevel });
+      await actor.update({ "system.details.xp.value": XPAfterLevel });
     }
 
-    createGlobalLevelMessage(
-      actorName,
-      targetLevel,
-      selectedFeats,
-      skillIncreaseMessage
-    );
+    createGlobalLevelMessage(actorName, targetLevel, selectedFeats, skillIncreaseMessage);
 
     createPersonalLevelMessage(finalData, playerId, actorName);
 
     ui.notifications.info(
-      game.i18n.format('PF2E_LEVEL_UP_WIZARD.notifications.levelUpComplete', {
+      game.i18n.format("PF2E_LEVEL_UP_WIZARD.notifications.levelUpComplete", {
         actorName
       })
     );

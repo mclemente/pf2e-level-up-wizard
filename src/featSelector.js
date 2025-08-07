@@ -1,9 +1,5 @@
-import { createFeatChatMessage } from './helpers/foundryHelpers.js';
-import {
-  getAssociatedSkills,
-  getSkillTranslation,
-  SKILLS
-} from './helpers/skillsHelpers.js';
+import { createFeatChatMessage } from "./helpers/foundryHelpers.js";
+import { getAssociatedSkills, getSkillTranslation, SKILLS } from "./helpers/skillsHelpers.js";
 
 export class FeatSelector extends foundry.applications.api.ApplicationV2 {
   constructor(feats, featType, actorName, targetLevel, options) {
@@ -14,28 +10,25 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
     this.allFeats = feats;
     this.filteredFeats = [...feats];
 
-    const defaultSort = game.settings.get(
-      'pf2e-level-up-wizard',
-      'feat-sort-method'
-    );
-    const [sortMethod, sortOrder] = defaultSort.toLowerCase().split('_');
+    const defaultSort = game.settings.get("pf2e-level-up-wizard", "feat-sort-method");
+    const [sortMethod, sortOrder] = defaultSort.toLowerCase().split("_");
 
     this.filters = {
       minLevel: null,
       maxLevel: null,
-      search: '',
+      search: "",
       sortMethod: sortMethod,
       sortOrder: sortOrder,
       skills: [],
       includeArchetypeFeats: false,
       hideSkillFeats: false,
-      dedicationSearch: ''
+      dedicationSearch: ""
     };
   }
 
   static DEFAULT_OPTIONS = {
-    id: 'feat-selector',
-    classes: ['feat-selector'],
+    id: "feat-selector",
+    classes: ["feat-selector"],
     position: {
       width: 600,
       height: 500
@@ -50,25 +43,22 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
 
   get title() {
     const featTypeMapping = {
-      classFeats: 'Class Feats',
-      dualClassFeats: 'Class Feats',
-      freeArchetypeFeats: 'Free Archetype Feats',
-      skillFeats: 'Skill Feats',
-      generalFeats: 'General Feats',
-      ancestryFeats: 'Ancestry Feats',
-      ancestryParagonFeats: 'Ancestry Paragon Feats'
+      classFeats: "Class Feats",
+      dualClassFeats: "Class Feats",
+      freeArchetypeFeats: "Free Archetype Feats",
+      skillFeats: "Skill Feats",
+      generalFeats: "General Feats",
+      ancestryFeats: "Ancestry Feats",
+      ancestryParagonFeats: "Ancestry Paragon Feats"
     };
 
-    const featTypeName = featTypeMapping[this.featType] || 'Feats';
+    const featTypeName = featTypeMapping[this.featType] || "Feats";
 
     return `${this.actorName} ${featTypeName} | Level ${this.targetLevel}`;
   }
 
   _prepareContext() {
-    const showPrerequisites = game.settings.get(
-      'pf2e-level-up-wizard',
-      'show-feat-prerequisites'
-    );
+    const showPrerequisites = game.settings.get("pf2e-level-up-wizard", "show-feat-prerequisites");
     const localizedSkills = SKILLS.map((skill) => ({
       key: skill,
       label: getSkillTranslation(skill)
@@ -91,23 +81,20 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
   }
 
   _onRender() {
-    const dedicationSearch = $(this.element).find('#search-dedications');
-    if (this.featType === 'freeArchetypeFeats') {
-      $(dedicationSearch).removeClass('hidden');
+    const dedicationSearch = $(this.element).find("#search-dedications");
+    if (this.featType === "freeArchetypeFeats") {
+      $(dedicationSearch).removeClass("hidden");
     }
 
     this.updateFilteredFeats();
   }
 
   async _renderHTML(context) {
-    return renderTemplate(
-      `modules/pf2e-level-up-wizard/templates/feat-selector.hbs`,
-      context
-    );
+    return renderTemplate(`modules/pf2e-level-up-wizard/templates/feat-selector.hbs`, context);
   }
 
   _replaceHTML(element, html) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.innerHTML = element;
     html.replaceChildren(div);
     this.activateListeners(html);
@@ -116,69 +103,63 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
   activateListeners(html) {
     // Event: Min Level
     $(html)
-      .find('#min-level')
-      .on('input', (e) => {
+      .find("#min-level")
+      .on("input", (e) => {
         this.filters.minLevel = parseInt(e.target.value, 10) || null;
         this.updateFilteredFeats();
       });
 
     // Event: Max Level
     $(html)
-      .find('#max-level')
-      .on('input', (e) => {
+      .find("#max-level")
+      .on("input", (e) => {
         this.filters.maxLevel = parseInt(e.target.value, 10) || null;
         this.updateFilteredFeats();
       });
 
     // Event: Search
     $(html)
-      .find('#search-feats')
-      .on('input', (e) => {
+      .find("#search-feats")
+      .on("input", (e) => {
         this.filters.search = e.target.value.toLowerCase();
         this.updateFilteredFeats();
       });
 
     // Event: Sort
     $(html)
-      .find('#sort-options')
-      .on('change', (e) => {
+      .find("#sort-options")
+      .on("change", (e) => {
         this.filters.sortMethod = e.target.value;
         this.updateFilteredFeats();
       });
 
     // Event: Sort
     $(html)
-      .find('#order-button')
-      .on('click', () => {
-        if (this.filters.sortOrder === 'desc') {
-          this.filters.sortOrder = 'asc';
+      .find("#order-button")
+      .on("click", () => {
+        if (this.filters.sortOrder === "desc") {
+          this.filters.sortOrder = "asc";
         } else {
-          this.filters.sortOrder = 'desc';
+          this.filters.sortOrder = "desc";
         }
         this.updateFilteredFeats();
       });
 
     // Event: Skill Dropdown
-    const skillFilter = $(html).find('#skill-filter');
+    const skillFilter = $(html).find("#skill-filter");
     $(html)
-      .find('.skill-filter-label')
-      .on('click', () => {
-        skillFilter.toggleClass('hidden');
+      .find(".skill-filter-label")
+      .on("click", () => {
+        skillFilter.toggleClass("hidden");
 
-        const skillLabelIcon = $(html)
-          .find('.skill-filter-label')
-          .children('i');
+        const skillLabelIcon = $(html).find(".skill-filter-label").children("i");
         skillLabelIcon
           .removeClass()
-          .addClass(
-            skillFilter.hasClass('hidden')
-              ? 'fa-solid fa-chevron-down'
-              : 'fa-solid fa-chevron-up'
-          );
+          .addClass(skillFilter.hasClass("hidden") ? "fa-solid fa-chevron-down" : "fa-solid fa-chevron-up");
       });
 
     // Event: Select Skill
-    skillFilter.on('change', 'input[type="checkbox"]', (e) => {
+    skillFilter.on("change", 'input[type="checkbox"]', (e) => {
       const skill = e.target.value;
 
       if (e.target.checked) {
@@ -191,20 +172,20 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
     });
 
     // Event: Include Archetype Feats
-    const archetypeCheckbox = $(html).find('#show-archetype-feats');
-    const dedicationSearch = $(html).find('#search-dedications');
+    const archetypeCheckbox = $(html).find("#show-archetype-feats");
+    const dedicationSearch = $(html).find("#search-dedications");
 
     if (archetypeCheckbox.length) {
-      archetypeCheckbox.on('change', (e) => {
+      archetypeCheckbox.on("change", (e) => {
         const isChecked = e.target.checked;
         this.filters.includeArchetypeFeats = isChecked;
 
         if (isChecked) {
-          dedicationSearch.removeClass('hidden');
+          dedicationSearch.removeClass("hidden");
         } else {
-          dedicationSearch.addClass('hidden');
-          this.filters.dedicationSearch = '';
-          dedicationSearch.val('');
+          dedicationSearch.addClass("hidden");
+          this.filters.dedicationSearch = "";
+          dedicationSearch.val("");
         }
 
         this.updateFilteredFeats();
@@ -213,27 +194,27 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
 
     // Event: Dedication Search
     $(html)
-      .find('#search-dedications')
-      .on('input', (e) => {
+      .find("#search-dedications")
+      .on("input", (e) => {
         this.filters.dedicationSearch = e.target.value.toLowerCase();
         this.updateFilteredFeats();
       });
 
     // Event: Hide Skill Feats
-    const hideSkillFeatsCheckbox = $(html).find('#hide-skill-feats');
-    const skillFilterContainer = $(html).find('.skill-filter-container');
+    const hideSkillFeatsCheckbox = $(html).find("#hide-skill-feats");
+    const skillFilterContainer = $(html).find(".skill-filter-container");
 
     if (hideSkillFeatsCheckbox.length) {
-      hideSkillFeatsCheckbox.on('change', (e) => {
+      hideSkillFeatsCheckbox.on("change", (e) => {
         const isChecked = e.target.checked;
         this.filters.hideSkillFeats = isChecked;
 
         if (isChecked) {
-          skillFilterContainer.addClass('hidden');
+          skillFilterContainer.addClass("hidden");
           this.filters.skills = [];
-          skillFilter.find('input[type="checkbox"]').prop('checked', false);
+          skillFilter.find('input[type="checkbox"]').prop("checked", false);
         } else {
-          skillFilterContainer.removeClass('hidden');
+          skillFilterContainer.removeClass("hidden");
         }
 
         this.updateFilteredFeats();
@@ -242,9 +223,9 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
 
     // Event: Select Feat
     $(html)
-      .find('.feat-list')
-      .on('click', '[class="confirm-feat-button"]', (e) => {
-        const target = e.target.closest('.feat-option');
+      .find(".feat-list")
+      .on("click", '[class="confirm-feat-button"]', (e) => {
+        const target = e.target.closest(".feat-option");
         if (target) {
           this.selectFeat(target.dataset.uuid);
         }
@@ -252,10 +233,10 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
 
     // Event: Send Feat to Chat
     $(html)
-      .find('.feat-list')
-      .on('click', '[data-action="send-to-chat"]', async (e) => {
-        const container = $(e.currentTarget).closest('.feat-option');
-        const uuid = container.data('uuid');
+      .find(".feat-list")
+      .on("click", '[data-action="send-to-chat"]', async (e) => {
+        const container = $(e.currentTarget).closest(".feat-option");
+        const uuid = container.data("uuid");
         if (uuid) {
           const feat = await fromUuid(uuid);
           if (feat) {
@@ -273,7 +254,7 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
       return;
     }
 
-    const event = new CustomEvent('featSelected', {
+    const event = new CustomEvent("featSelected", {
       detail: { featType: this.featType, selectedFeat }
     });
     window.dispatchEvent(event);
@@ -282,60 +263,41 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
   }
 
   updateFilteredFeats() {
-    const includeArchetypeFeats =
-      this.featType === 'freeArchetypeFeats' ||
-      this.filters.includeArchetypeFeats;
+    const includeArchetypeFeats = this.featType === "freeArchetypeFeats" || this.filters.includeArchetypeFeats;
 
-    const hideSkillFeats =
-      this.featType === 'generalFeats' && this.filters.hideSkillFeats;
+    const hideSkillFeats = this.featType === "generalFeats" && this.filters.hideSkillFeats;
 
-    const hideUncommonFeats = game.settings.get(
-      'pf2e-level-up-wizard',
-      'hide-uncommon-feats'
-    );
+    const hideUncommonFeats = game.settings.get("pf2e-level-up-wizard", "hide-uncommon-feats");
 
     this.filteredFeats = this.allFeats.filter((feat) => {
-      const matchesMinLevel =
-        this.filters.minLevel === null ||
-        feat.system.level.value >= this.filters.minLevel;
+      const matchesMinLevel = this.filters.minLevel === null || feat.system.level.value >= this.filters.minLevel;
 
-      const matchesMaxLevel =
-        this.filters.maxLevel === null ||
-        feat.system.level.value <= this.filters.maxLevel;
+      const matchesMaxLevel = this.filters.maxLevel === null || feat.system.level.value <= this.filters.maxLevel;
 
-      const matchesSearch = feat.name
-        .toLowerCase()
-        .includes(this.filters.search);
+      const matchesSearch = feat.name.toLowerCase().includes(this.filters.search);
 
-      const matchesHideSkillFeats =
-        !hideSkillFeats || !feat.system.traits.value.includes('skill');
+      const matchesHideSkillFeats = !hideSkillFeats || !feat.system.traits.value.includes("skill");
 
       const associatedSkills = getAssociatedSkills(feat.system.prerequisites);
       const matchesSkills =
-        this.filters.skills.length === 0 ||
-        this.filters.skills.some((skill) => associatedSkills.includes(skill));
+        this.filters.skills.length === 0 || this.filters.skills.some((skill) => associatedSkills.includes(skill));
 
-      const isArchetypeFeat =
-        feat.system.traits.value.includes('archetype') || feat.isArchetypeFeat;
+      const isArchetypeFeat = feat.system.traits.value.includes("archetype") || feat.isArchetypeFeat;
 
       const matchesArchetype = includeArchetypeFeats || !isArchetypeFeat;
 
-      const dedicationTranslated = game.i18n
-        .localize('PF2E.TraitDedication')
-        .toLowerCase();
+      const dedicationTranslated = game.i18n.localize("PF2E.TraitDedication").toLowerCase();
       const matchesDedicationSearch =
         !this.filters.dedicationSearch ||
         feat.system.prerequisites?.value?.some((prereq) => {
           const prerequisiteValue = prereq.value.toLowerCase();
           return (
             prerequisiteValue.includes(this.filters.dedicationSearch) &&
-            (prerequisiteValue.includes('dedication') ||
-              prerequisiteValue.includes(dedicationTranslated))
+            (prerequisiteValue.includes("dedication") || prerequisiteValue.includes(dedicationTranslated))
           );
         });
 
-      const matchesHideUncommonFeats =
-        !hideUncommonFeats || feat.system.traits.rarity === 'common';
+      const matchesHideUncommonFeats = !hideUncommonFeats || feat.system.traits.rarity === "common";
 
       return (
         matchesMinLevel &&
@@ -354,40 +316,38 @@ export class FeatSelector extends foundry.applications.api.ApplicationV2 {
   }
 
   sortFeats() {
-    const button = $(this.element).find('#order-button').children('i');
+    const button = $(this.element).find("#order-button").children("i");
 
     const iconMapping = {
-      'alpha-asc': 'fa-solid fa-sort-alpha-up',
-      'alpha-desc': 'fa-solid fa-sort-alpha-down-alt',
-      'level-asc': 'fa-solid fa-sort-numeric-up',
-      'level-desc': 'fa-solid fa-sort-numeric-down-alt'
+      "alpha-asc": "fa-solid fa-sort-alpha-up",
+      "alpha-desc": "fa-solid fa-sort-alpha-down-alt",
+      "level-asc": "fa-solid fa-sort-numeric-up",
+      "level-desc": "fa-solid fa-sort-numeric-down-alt"
     };
 
     const sortMethod = `${this.filters.sortMethod}-${this.filters.sortOrder}`;
 
-    button.removeClass().addClass(iconMapping[sortMethod] || '');
+    button.removeClass().addClass(iconMapping[sortMethod] || "");
 
     this.filteredFeats.sort((a, b) => {
-      if (sortMethod === 'level-desc')
-        return b.system.level.value - a.system.level.value;
-      if (sortMethod === 'level-asc')
-        return a.system.level.value - b.system.level.value;
-      if (sortMethod === 'alpha-asc') return a.name.localeCompare(b.name);
-      if (sortMethod === 'alpha-desc') return b.name.localeCompare(a.name);
+      if (sortMethod === "level-desc") return b.system.level.value - a.system.level.value;
+      if (sortMethod === "level-asc") return a.system.level.value - b.system.level.value;
+      if (sortMethod === "alpha-asc") return a.name.localeCompare(b.name);
+      if (sortMethod === "alpha-desc") return b.name.localeCompare(a.name);
     });
   }
 
   async updateFeatList() {
-    const listContainer = this.element.querySelector('.feat-list');
+    const listContainer = this.element.querySelector(".feat-list");
     if (!listContainer) return;
 
-    listContainer.innerHTML = '';
+    listContainer.innerHTML = "";
 
     const templatePath = `modules/pf2e-level-up-wizard/templates/partials/feat-option.hbs`;
 
     for (const feat of this.filteredFeats) {
       const html = await renderTemplate(templatePath, feat);
-      listContainer.insertAdjacentHTML('beforeend', html);
+      listContainer.insertAdjacentHTML("beforeend", html);
     }
   }
 }

@@ -8,28 +8,24 @@ export const attachValidationHandlers = (
 ) => {
   const validateForm = () => {
     const requiredFields = form.find('[data-required="true"]');
-    const allRequiredValid = Array.from(requiredFields).every(
-      (field) => field.value.trim() !== ''
-    );
+    const allRequiredValid = Array.from(requiredFields).every((field) => field.value.trim() !== "");
 
     const featsValid = requiredFeats.every((featType) => {
       const button = form.find(`#${featType}`);
       const featSelected = button.text().trim();
-      return featSelected && featSelected !== 'Make a Selection';
+      return featSelected && featSelected !== "Make a Selection";
     });
 
-    const boostsValid = attributeButtons.length
-      ? selectedBoosts.size === allowedBoostsForSet
-      : true;
+    const boostsValid = attributeButtons.length ? selectedBoosts.size === allowedBoostsForSet : true;
 
     const allValid = allRequiredValid && boostsValid && featsValid;
 
-    submitButton.prop('disabled', !allValid);
+    submitButton.prop("disabled", !allValid);
   };
 
   validateForm();
 
-  form.on('change', '[data-required="true"]', validateForm);
+  form.on("change", '[data-required="true"]', validateForm);
 
   return validateForm;
 };
@@ -45,79 +41,60 @@ export const attachAttributeBoostHandlers = (
   const updateButtonStates = () => {
     attributeButtons.each((_, buttonElement) => {
       const button = $(buttonElement);
-      const attribute = button.data('value');
+      const attribute = button.data("value");
       const isSelected = selectedBoosts.has(attribute);
 
-      const partialBoostEntry = partialBoosts.find(
-        (boost) => boost.key === attribute
-      );
+      const partialBoostEntry = partialBoosts.find((boost) => boost.key === attribute);
       const isPartial = partialBoostEntry?.isPartial || false;
       const isPreSelected = boostsForCurrentSet.includes(attribute);
 
       const modifierElement = $(`#modifier-${attribute}`);
       const currentModifier = parseInt(modifierElement.text(), 10);
 
-      if (isSelected && !button.hasClass('updated')) {
+      if (isSelected && !button.hasClass("updated")) {
         button.html(
           `<span class="boost-text">${
             isPartial
-              ? game.i18n.localize(
-                  'PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.partial'
-                )
-              : game.i18n.localize(
-                  'PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.boost'
-                )
+              ? game.i18n.localize("PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.partial")
+              : game.i18n.localize("PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.boost")
           }</span>`
         );
-        button.toggleClass('partial', isPartial);
+        button.toggleClass("partial", isPartial);
 
-        const newModifier =
-          isPreSelected || isPartial ? currentModifier : currentModifier + 1;
-        modifierElement.text(
-          newModifier >= 0 ? `+${newModifier}` : newModifier
-        );
-        button.addClass('updated');
-      } else if (!isSelected && button.hasClass('updated')) {
+        const newModifier = isPreSelected || isPartial ? currentModifier : currentModifier + 1;
+        modifierElement.text(newModifier >= 0 ? `+${newModifier}` : newModifier);
+        button.addClass("updated");
+      } else if (!isSelected && button.hasClass("updated")) {
         button.html(
-          `<span class="boost-text">${game.i18n.localize(
-            'PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.boost'
-          )}</span>`
+          `<span class="boost-text">${game.i18n.localize("PF2E_LEVEL_UP_WIZARD.menu.attributeBoosts.boost")}</span>`
         );
-        button.removeClass('partial');
+        button.removeClass("partial");
 
-        const newModifier =
-          isPreSelected || isPartial ? currentModifier : currentModifier - 1;
-        modifierElement.text(
-          newModifier >= 0 ? `+${newModifier}` : newModifier
-        );
-        button.removeClass('updated');
+        const newModifier = isPreSelected || isPartial ? currentModifier : currentModifier - 1;
+        modifierElement.text(newModifier >= 0 ? `+${newModifier}` : newModifier);
+        button.removeClass("updated");
       } else {
-        modifierElement.text(
-          currentModifier >= 0 ? `+${currentModifier}` : currentModifier
-        );
+        modifierElement.text(currentModifier >= 0 ? `+${currentModifier}` : currentModifier);
       }
 
-      if (
-        (selectedBoosts.size >= allowedBoostsForSet && !isSelected) ||
-        isPreSelected
-      ) {
-        button.prop('disabled', true);
+      if ((selectedBoosts.size >= allowedBoostsForSet && !isSelected) || isPreSelected) {
+        button.prop("disabled", true);
       } else {
-        button.prop('disabled', false);
+        button.prop("disabled", false);
       }
     });
   };
 
-  attributeButtons.on('click', (event) => {
+  attributeButtons.on("click", (event) => {
     const button = $(event.currentTarget);
-    const attribute = button.data('value');
+    const attribute = button.data("value");
 
     if (selectedBoosts.has(attribute)) {
       selectedBoosts.delete(attribute);
-      button.removeClass('selected');
+      button.removeClass("selected");
     } else if (selectedBoosts.size < 4) {
       selectedBoosts.add(attribute);
-      button.addClass('selected');
+      button.addClass("selected");
     }
 
     updateButtonStates();
@@ -126,10 +103,8 @@ export const attachAttributeBoostHandlers = (
 
   boostsForCurrentSet.forEach((boost) => {
     selectedBoosts.add(boost);
-    const relevantButton = attributeButtons.filter(
-      (_, button) => $(button).data('value') === boost
-    );
-    relevantButton.addClass('selected');
+    const relevantButton = attributeButtons.filter((_, button) => $(button).data("value") === boost);
+    relevantButton.addClass("selected");
   });
 
   updateButtonStates();

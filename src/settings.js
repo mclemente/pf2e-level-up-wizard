@@ -1,12 +1,9 @@
-import { renderLevelUpButton } from './actor.js';
-import { module_name } from './main.js';
+import { renderLevelUpButton } from "./actor.js";
+import { module_name } from "./main.js";
 
 const rerenderCharacterSheet = () => {
   Object.values(ui.windows).forEach((app) => {
-    if (
-      app.options.classes.includes('character') &&
-      app.actor?.type === 'character'
-    ) {
+    if (app.options.classes.includes("character") && app.actor?.type === "character") {
       app.render(false);
 
       const html = $(app.element);
@@ -16,167 +13,122 @@ const rerenderCharacterSheet = () => {
 };
 
 export const registerSettings = () => {
-  game.settings.register(module_name, 'show-level-up-button', {
-    name: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.showButton.name'),
-    hint: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.showButton.hint'),
-    scope: 'world',
+  game.settings.register(module_name, "show-level-up-button", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.showButton.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.showButton.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: true,
     requiresReload: true
   });
 
-  game.settings.register(module_name, 'button-placement', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.hint'
-    ),
-    scope: 'client',
+  game.settings.register(module_name, "button-placement", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.hint"),
+    scope: "client",
     config: true,
     type: String,
-    default: 'CHAR_HEADER_SMALL',
+    default: "CHAR_HEADER_SMALL",
     choices: {
-      CHAR_HEADER: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.charHeaderLarge'
-      ),
-      CHAR_HEADER_SMALL: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.charHeaderSmall'
-      ),
-      WINDOW_HEADER: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.windowHeader'
-      )
+      CHAR_HEADER: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.charHeaderLarge"),
+      CHAR_HEADER_SMALL: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.charHeaderSmall"),
+      WINDOW_HEADER: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.buttonPlacement.options.windowHeader")
     },
     onChange: rerenderCharacterSheet
   });
 
-  game.settings.register(module_name, 'feat-sort-method', {
-    name: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.sortMethod.name'),
-    hint: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.sortMethod.hint'),
-    scope: 'client',
+  game.settings.register(module_name, "feat-sort-method", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.hint"),
+    scope: "client",
     config: true,
-    default: 'LEVEL_DESC',
+    default: "LEVEL_DESC",
     choices: {
-      LEVEL_DESC: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.levelDesc'
-      ),
-      LEVEL_ASC: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.levelAsc'
-      ),
-      ALPHA_DESC: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.alphaDesc'
-      ),
-      ALPHA_ASC: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.alphaAsc'
-      )
+      LEVEL_DESC: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.levelDesc"),
+      LEVEL_ASC: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.levelAsc"),
+      ALPHA_DESC: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.alphaDesc"),
+      ALPHA_ASC: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sortMethod.options.alphaAsc")
     }
   });
 
-  game.settings.register(module_name, 'show-feat-prerequisites', {
-    name: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.featPrereqs.name'),
-    hint: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.featPrereqs.hint'),
-    scope: 'world',
+  game.settings.register(module_name, "show-feat-prerequisites", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.featPrereqs.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.featPrereqs.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: false,
     onChange: () => {
       Object.values(ui.windows).forEach((app) => {
-        if (app.options.id === 'level-up-wizard') {
+        if (app.options.id === "level-up-wizard") {
           app.render(true);
         }
       });
     }
   });
 
-  game.settings.register(module_name, 'skill-increase-info', {
-    name: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.skillInfo.name'),
-    hint: game.i18n.localize('PF2E_LEVEL_UP_WIZARD.settings.skillInfo.hint'),
-    scope: 'client',
+  game.settings.register(module_name, "skill-increase-info", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.hint"),
+    scope: "client",
     config: true,
     type: String,
-    default: 'NAME_ONLY',
+    default: "NAME_ONLY",
     choices: {
-      NAME_ONLY: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameOnly'
-      ),
-      NAME_WITH_MOD: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithMod'
-      ),
-      NAME_WITH_RANK: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithRank'
-      ),
-      NAME_WITH_MOD_AND_RANK: game.i18n.localize(
-        'PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithModAndRank'
-      )
+      NAME_ONLY: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameOnly"),
+      NAME_WITH_MOD: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithMod"),
+      NAME_WITH_RANK: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithRank"),
+      NAME_WITH_MOD_AND_RANK: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.skillInfo.options.nameWithModAndRank")
     }
   });
 
-  game.settings.register(module_name, 'disable-level-input', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.disableLevelInput.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.disableLevelInput.hint'
-    ),
-    scope: 'world',
+  game.settings.register(module_name, "disable-level-input", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.disableLevelInput.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.disableLevelInput.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: false,
     onChange: rerenderCharacterSheet
   });
 
-  game.settings.register(module_name, 'send-gm-whispers', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.sendGMWhispers.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.sendGMWhispers.hint'
-    ),
-    scope: 'world',
+  game.settings.register(module_name, "send-gm-whispers", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sendGMWhispers.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.sendGMWhispers.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: false
   });
 
-  game.settings.register(module_name, 'hide-uncommon-feats', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.hideUncommonFeats.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.hideUncommonFeats.hint'
-    ),
-    scope: 'world',
+  game.settings.register(module_name, "hide-uncommon-feats", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.hideUncommonFeats.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.hideUncommonFeats.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: false
   });
 
-  game.settings.register(module_name, 'xp-enforcement', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.xpEnforcement.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.xpEnforcement.hint'
-    ),
-    scope: 'world',
+  game.settings.register(module_name, "xp-enforcement", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.xpEnforcement.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.xpEnforcement.hint"),
+    scope: "world",
     config: true,
     type: Boolean,
     default: false
   });
 
   const compendiumChoices = Object.fromEntries(
-            game.packs
-              .filter((c) => c.metadata.packageType !== "system" && c.metadata.type === "Item")
-              .map((c) => [c.metadata.id, c.metadata.label]));
-  game.settings.register(module_name, 'additional-feat-compendiums', {
-    name: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.additionalCompendiums.name'
-    ),
-    hint: game.i18n.localize(
-      'PF2E_LEVEL_UP_WIZARD.settings.additionalCompendiums.hint'
-    ),
-    scope: 'world',
+    game.packs
+      .filter((c) => c.metadata.packageType !== "system" && c.metadata.type === "Item")
+      .map((c) => [c.metadata.id, c.metadata.label])
+  );
+  game.settings.register(module_name, "additional-feat-compendiums", {
+    name: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.additionalCompendiums.name"),
+    hint: game.i18n.localize("PF2E_LEVEL_UP_WIZARD.settings.additionalCompendiums.hint"),
+    scope: "world",
     config: true,
     type: new foundry.data.fields.SetField(
       new foundry.data.fields.StringField({ required: true, blank: false, choices: compendiumChoices })

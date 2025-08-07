@@ -174,15 +174,15 @@
   margin-top: 0.5rem;
   padding: 0.2rem 0.3rem 0 0.5rem;
 
-  input[type='text'] {
+  input[type="text"] {
     flex: none;
   }
 
-  input[type='number'] {
+  input[type="number"] {
     flex: none;
   }
 
-  input[type='checkbox'] {
+  input[type="checkbox"] {
     margin-left: 0;
   }
 }
@@ -268,8 +268,7 @@
   --inset-shadow-length: 0.25rem;
   border: none;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px var(--tertiary), 0 0 0 2px #9f725b,
-    inset 0 0 var(--inset-shadow-length) rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 1px var(--tertiary), 0 0 0 2px #9f725b, inset 0 0 var(--inset-shadow-length) rgba(0, 0, 0, 0.5);
 
   > img {
     max-width: 2rem;

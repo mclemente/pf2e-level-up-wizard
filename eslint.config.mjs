@@ -1,34 +1,34 @@
-import globals from 'globals';
-import pluginJs from '@eslint/js';
+import globals from "globals";
+import pluginJs from "@eslint/js";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
+      ecmaVersion: "latest",
+      sourceType: "module",
       globals: {
         ...globals.browser,
-        $: 'readonly',
-        jQuery: 'readonly',
-        CONFIG: 'readonly',
-        ui: 'readonly',
-        game: 'readonly',
-        Hooks: 'readonly',
-        Handlebars: 'readonly',
-        FormApplication: 'readonly',
-        ChatMessage: 'readonly',
-        fromUuid: 'readonly',
-        foundry: 'readonly',
-        getTemplate: 'readonly',
-        loadTemplates: 'readonly',
-        renderTemplate: 'readonly'
+        $: "readonly",
+        jQuery: "readonly",
+        CONFIG: "readonly",
+        ui: "readonly",
+        game: "readonly",
+        Hooks: "readonly",
+        Handlebars: "readonly",
+        FormApplication: "readonly",
+        ChatMessage: "readonly",
+        fromUuid: "readonly",
+        foundry: "readonly",
+        getTemplate: "readonly",
+        loadTemplates: "readonly",
+        renderTemplate: "readonly"
       }
     },
     rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off',
-      'no-undef': 'error'
+      "no-unused-vars": "warn",
+      "no-console": "off",
+      "no-undef": "error"
     }
   },
   pluginJs.configs.recommended

@@ -1,5 +1,5 @@
-import { module_name } from '../main.js';
-import { normalizeString } from './utility.js';
+import { module_name } from "../main.js";
+import { normalizeString } from "./utility.js";
 
 const freeArchetypeAndMythicFeatLevels = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
 const ancestryParagonFeatLevels = [1, 3, 7, 11, 15, 19];
@@ -10,16 +10,13 @@ const getCachedFeats = async () => {
   if (!cachedFeats) {
     const allFeats = [];
 
-    const defaultCompendium = game.packs.get('pf2e.feats-srd');
+    const defaultCompendium = game.packs.get("pf2e.feats-srd");
     if (defaultCompendium) {
       const defaultFeats = await defaultCompendium.getDocuments();
       allFeats.push(...defaultFeats);
     }
 
-    const additionalCompendiumsSetting = game.settings.get(
-      module_name,
-      'additional-feat-compendiums'
-    );
+    const additionalCompendiumsSetting = game.settings.get(module_name, "additional-feat-compendiums");
 
     for (const key of additionalCompendiumsSetting) {
       const compendium = game.packs.get(key);
@@ -27,30 +24,21 @@ const getCachedFeats = async () => {
         try {
           const collection = await compendium.getDocuments();
 
-          const feats = collection.filter(
-            (item) =>
-              item.type === 'feat' && item.system.category !== 'classfeature'
-          );
+          const feats = collection.filter((item) => item.type === "feat" && item.system.category !== "classfeature");
           allFeats.push(...feats);
         } catch (err) {
           ui.notifications.warn(
-            game.i18n.format(
-              'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.failedToLoad',
-              {
-                key
-              }
-            ),
+            game.i18n.format("PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.failedToLoad", {
+              key
+            }),
             err
           );
         }
       } else {
         ui.notifications.warn(
-          game.i18n.format(
-            'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.compendiumNotFound',
-            {
-              key
-            }
-          )
+          game.i18n.format("PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.compendiumNotFound", {
+            key
+          })
         );
       }
     }
@@ -62,8 +50,7 @@ const getCachedFeats = async () => {
 };
 
 const loadManualArchetypeFeats = async () => {
-  const jsonPath =
-    'modules/pf2e-level-up-wizard/src/data/grantedArchetypeFeats.json';
+  const jsonPath = "modules/pf2e-level-up-wizard/src/data/grantedArchetypeFeats.json";
   try {
     return await foundry.utils.fetchJsonWithTimeout(jsonPath);
   } catch (error) {
@@ -86,15 +73,12 @@ const filterFeats = async (searchQueries, targetLevel, existingFeats) => {
     const maxTakable = feat.system.maxTakable;
 
     const isManualArchetypeFeat =
-      normalizedQueries.includes('archetype') &&
-      Object.values(manualArchetypeFeats).flat().includes(feat.slug);
+      normalizedQueries.includes("archetype") && Object.values(manualArchetypeFeats).flat().includes(feat.slug);
 
-    const isDestinyTraitExcluded =
-      targetLevel > 12 && traits.includes('destiny');
+    const isDestinyTraitExcluded = targetLevel > 12 && traits.includes("destiny");
 
     return (
-      (normalizedQueries.some((query) => traits.includes(query)) ||
-        isManualArchetypeFeat) &&
+      (normalizedQueries.some((query) => traits.includes(query)) || isManualArchetypeFeat) &&
       feat.system.level.value <= targetLevel &&
       !(isTaken && maxTakable === 1) &&
       !isDestinyTraitExcluded
@@ -104,15 +88,15 @@ const filterFeats = async (searchQueries, targetLevel, existingFeats) => {
 
 const sortFeats = (feats, method) => {
   switch (method) {
-    case 'LEVEL_ASC':
+    case "LEVEL_ASC":
       return feats.sort((a, b) =>
         a.system.level.value !== b.system.level.value
           ? a.system.level.value - b.system.level.value
           : a.name.localeCompare(b.name)
       );
-    case 'ALPHABETICAL':
+    case "ALPHABETICAL":
       return feats.sort((a, b) => a.name.localeCompare(b.name));
-    case 'LEVEL_DESC':
+    case "LEVEL_DESC":
     default:
       return feats.sort((a, b) =>
         a.system.level.value !== b.system.level.value
@@ -123,25 +107,18 @@ const sortFeats = (feats, method) => {
 };
 
 const getExistingFeats = (actor) => {
-  return actor.items
-    .filter((item) => item.type === 'feat')
-    .map((item) => item.name.toLowerCase());
+  return actor.items.filter((item) => item.type === "feat").map((item) => item.name.toLowerCase());
 };
 
-export const getFeatsForLevel = async (
-  characterData,
-  type,
-  targetLevel,
-  dualClassName
-) => {
+export const getFeatsForLevel = async (characterData, type, targetLevel, dualClassName) => {
   let levelsArray = [];
 
   switch (type) {
-    case 'archetype':
-    case 'mythic':
+    case "archetype":
+    case "mythic":
       levelsArray = freeArchetypeAndMythicFeatLevels;
       break;
-    case 'ancestryParagon':
+    case "ancestryParagon":
       levelsArray = ancestryParagonFeatLevels;
       break;
     default:
@@ -155,22 +132,22 @@ export const getFeatsForLevel = async (
     class: dualClassName || characterData?.class?.name,
     ancestry: characterData?.ancestry?.name,
     ancestryParagon: characterData?.ancestry?.name,
-    general: 'general',
-    skill: 'skill',
-    archetype: 'archetype',
-    mythic: targetLevel !== 12 ? 'mythic' : 'destiny'
+    general: "general",
+    skill: "skill",
+    archetype: "archetype",
+    mythic: targetLevel !== 12 ? "mythic" : "destiny"
   };
 
   let searchQuery = queryMap[type];
-  if (type === 'ancestry' || type === 'ancestryParagon') {
+  if (type === "ancestry" || type === "ancestryParagon") {
     const heritage = characterData?.heritage?.name;
     if (heritage) {
       searchQuery = [characterData?.ancestry?.name, heritage];
 
-      if (heritage === 'Aiuvarin') {
-        searchQuery.push('Elf');
-      } else if (heritage === 'Dromaar') {
-        searchQuery.push('Orc');
+      if (heritage === "Aiuvarin") {
+        searchQuery.push("Elf");
+      } else if (heritage === "Dromaar") {
+        searchQuery.push("Orc");
       }
     }
   }
@@ -182,10 +159,7 @@ export const getFeatsForLevel = async (
   const existingFeats = getExistingFeats(characterData);
   const feats = await filterFeats(searchQuery, targetLevel, existingFeats);
 
-  const archetypeFeats =
-    type === 'class'
-      ? await filterFeats('archetype', targetLevel, existingFeats)
-      : [];
+  const archetypeFeats = type === "class" ? await filterFeats("archetype", targetLevel, existingFeats) : [];
 
   archetypeFeats.forEach((feat) => {
     feat.isArchetypeFeat = true;
@@ -200,7 +174,7 @@ export const getFeatsForLevel = async (
 
   const allFeats = [...feats, ...uniqueArchetypeFeats];
 
-  const sortMethod = game.settings.get(module_name, 'feat-sort-method');
+  const sortMethod = game.settings.get(module_name, "feat-sort-method");
 
   return sortFeats(allFeats, sortMethod);
 };
