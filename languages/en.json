@@ -153,7 +153,7 @@
       },
       "additionalCompendiums": {
         "name": "Additional Feat Sources",
-        "hint": "Specify a comma-separated list of compendium keys containing feats you would like included in the wizard. Example: 'pf2e-playtest-data.impossible-playtest-class-feats, my-custom-compendium.feats'. Ensure the compendiums are enabled and accessible."
+        "hint": "Specify which compendiums containing feats you would like included in the wizard. Ensure the compendiums are enabled and accessible."
       },
       "hideUncommonFeats": {
         "name": "Hide Rare and Uncommon Feats",
@@ -196,8 +196,8 @@
       "invalidBoostSelection": "Invalid boost selections.",
       "translatedDualClassError": "Level-Up Wizard cannot be used with translated dual classes",
       "additionalCompendiums": {
-        "failedToLoad": "Failed to load compendium {key}. Ensure it is a valid feats compendium.",
-        "compendiumNotFound": "Compendium {key} not found. Ensure it is correctly spelled and enabled in your game settings."
+        "failedToLoad": "Failed to load compendium {key}.",
+        "compendiumNotFound": "Compendium {key} not found."
       }
     }
   }

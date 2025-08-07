@@ -1,5 +1,5 @@
-import { module_name } from './main.js';
 import { renderLevelUpButton } from './actor.js';
+import { module_name } from './main.js';
 
 const rerenderCharacterSheet = () => {
   Object.values(ui.windows).forEach((app) => {
@@ -165,6 +165,10 @@ export const registerSettings = () => {
     default: false
   });
 
+  const compendiumChoices = Object.fromEntries(
+            game.packs
+              .filter((c) => c.metadata.packageType !== "system" && c.metadata.type === "Item")
+              .map((c) => [c.metadata.id, c.metadata.label]));
   game.settings.register(module_name, 'additional-feat-compendiums', {
     name: game.i18n.localize(
       'PF2E_LEVEL_UP_WIZARD.settings.additionalCompendiums.name'
@@ -174,7 +178,8 @@ export const registerSettings = () => {
     ),
     scope: 'world',
     config: true,
-    type: String,
-    requiresReload: true
+    type: new foundry.data.fields.SetField(
+      new foundry.data.fields.StringField({ required: true, blank: false, choices: compendiumChoices })
+    )
   });
 };

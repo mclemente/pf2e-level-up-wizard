@@ -8,12 +8,12 @@ let cachedFeats = null;
 
 const getCachedFeats = async () => {
   if (!cachedFeats) {
-    let allFeats = [];
+    const allFeats = [];
 
     const defaultCompendium = game.packs.get('pf2e.feats-srd');
     if (defaultCompendium) {
       const defaultFeats = await defaultCompendium.getDocuments();
-      allFeats = allFeats.concat(defaultFeats);
+      allFeats.push(...defaultFeats);
     }
 
     const additionalCompendiumsSetting = game.settings.get(
@@ -21,43 +21,37 @@ const getCachedFeats = async () => {
       'additional-feat-compendiums'
     );
 
-    if (additionalCompendiumsSetting) {
-      const compendiumKeys = additionalCompendiumsSetting
-        .split(',')
-        .map((key) => key.trim());
+    for (const key of additionalCompendiumsSetting) {
+      const compendium = game.packs.get(key);
+      if (compendium) {
+        try {
+          const collection = await compendium.getDocuments();
 
-      for (const key of compendiumKeys) {
-        const compendium = game.packs.get(key);
-        if (compendium) {
-          try {
-            const collection = await compendium.getDocuments();
-
-            const feats = collection.filter(
-              (item) =>
-                item.type === 'feat' && item.system.category !== 'classfeature'
-            );
-            allFeats = allFeats.concat(feats);
-          } catch (err) {
-            ui.notifications.warn(
-              game.i18n.format(
-                'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.failedToLoad',
-                {
-                  key
-                }
-              ),
-              err
-            );
-          }
-        } else {
+          const feats = collection.filter(
+            (item) =>
+              item.type === 'feat' && item.system.category !== 'classfeature'
+          );
+          allFeats.push(...feats);
+        } catch (err) {
           ui.notifications.warn(
             game.i18n.format(
-              'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.compendiumNotFound',
+              'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.failedToLoad',
               {
                 key
               }
-            )
+            ),
+            err
           );
         }
+      } else {
+        ui.notifications.warn(
+          game.i18n.format(
+            'PF2E_LEVEL_UP_WIZARD.notifications.additionalCompendiums.compendiumNotFound',
+            {
+              key
+            }
+          )
+        );
       }
     }
 

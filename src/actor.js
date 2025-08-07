@@ -1,7 +1,8 @@
-import { module_name } from './main.js';
 import { renderWizard } from './helpers/foundryHelpers.js';
+import { module_name } from './main.js';
 
 export const renderLevelUpButton = (sheet, html) => {
+  if (!sheet.actor.class) return;
   const title = game.i18n.localize('PF2E_LEVEL_UP_WIZARD.button-tooltip');
 
   let shouldRenderWizardButton = true;
@@ -60,7 +61,7 @@ export const renderLevelUpButton = (sheet, html) => {
 };
 
 export const renderWizardOnLevelUp = (actor, updateData, options, userId) => {
-  if (actor.type !== 'character' || game.user.id !== userId) return;
+  if (actor.type !== 'character' || !actor.class || game.user.id !== userId) return;
 
   const newLevel = updateData?.system?.details?.level?.value;
 

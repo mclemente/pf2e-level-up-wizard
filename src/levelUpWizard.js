@@ -1,30 +1,30 @@
-import { module_name } from './main.js';
 import { FeatSelector } from './featSelector.js';
+import { module_name } from './main.js';
 
 // @Helpers
-import { normalizeString } from './helpers/utility.js';
-import { getFeatsForLevel } from './helpers/featsHelpers.js';
 import {
   detectPartialBoosts,
   getFeaturesForLevel
 } from './helpers/classFeaturesHelpers.js';
+import { getFeatsForLevel } from './helpers/featsHelpers.js';
 import {
   attachAttributeBoostHandlers,
   attachValidationHandlers
 } from './helpers/formHelpers.js';
-import {
-  getSkillsForLevel,
-  skillProficiencyRanks,
-  getSkillTranslation,
-  getSkillPotencyForLevel,
-  buildPotencyModifier
-} from './helpers/skillsHelpers.js';
 import {
   confirmChanges,
   createGlobalLevelMessage,
   createPersonalLevelMessage,
   getClassJournal
 } from './helpers/foundryHelpers.js';
+import {
+  buildPotencyModifier,
+  getSkillPotencyForLevel,
+  getSkillsForLevel,
+  getSkillTranslation,
+  skillProficiencyRanks
+} from './helpers/skillsHelpers.js';
+import { normalizeString } from './helpers/utility.js';
 
 export class PF2eLevelUpWizardConfig extends foundry.applications.api
   .ApplicationV2 {
@@ -154,9 +154,10 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       ? currentLevel
       : currentLevel + 1;
 
-    const freeArchetype = game.settings.get('pf2e', 'freeArchetypeVariant');
+    const isReallyPC = !this.actorData.traits.has("minion") && !this.actorData.traits.has("eidolon");
+    const freeArchetype = game.settings.get('pf2e', 'freeArchetypeVariant') && isReallyPC;
     const mythicVariantEnabled =
-      game.settings.get('pf2e', 'mythic') === 'enabled';
+      game.settings.get('pf2e', 'mythic') === 'enabled' && isReallyPC;
     const ABPEnabled =
       game.settings.get('pf2e', 'automaticBonusVariant') !== 'noABP';
     const ancestryParagon =
@@ -164,7 +165,8 @@ export class PF2eLevelUpWizardConfig extends foundry.applications.api
       game.settings.get(
         'xdy-pf2e-workbench',
         'legacyVariantRuleAncestryParagon'
-      );
+      )
+      && isReallyPC;
     const showFeatPrerequisites = game.settings.get(
       module_name,
       'show-feat-prerequisites'
